@@ -1,0 +1,35 @@
+{
+  "name": "mistralys/markdown-renderer",
+  "description": "CommonMark Markdown renderer for PHP with pre- and post-processors.",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Sebastian Mordziol",
+      "email": "s.mordziol@mistralys.com"
+    }
+  ],
+  "autoload": {
+    "classmap": [
+      "src"
+    ],
+    "files": [
+      "src/global-functions.php"
+    ]
+  },
+  "autoload-dev": {
+    "classmap": [
+      "tests/MarkdownRenderer/TestClasses"
+    ]
+  },
+  "require": {
+    "mistralys/application-utils-core": ">=2.4.0",
+    "mistralys/application-localization": ">=1.4.1",
+    "league/commonmark": ">=2.4.1"
+  },
+  "require-dev": {
+    "roave/security-advisories": "dev-latest",
+    "phpunit/phpunit": ">=11.2.9"
+  }
+}
