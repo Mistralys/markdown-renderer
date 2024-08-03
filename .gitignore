@@ -7,3 +7,4 @@ composer.phar
 .phpunit.cache/test-results
 .phpunit.result.cache
 phpunit.xml.bak
+.idea/php-test-framework.xml
