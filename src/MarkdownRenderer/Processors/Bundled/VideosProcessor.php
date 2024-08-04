@@ -9,8 +9,14 @@ declare(strict_types=1);
 namespace Mistralys\MarkdownRenderer\Processors\Bundled;
 
 use AppUtils\AttributeCollection;
+use AppUtils\FileHelper;
 use AppUtils\HTMLTag;
+use Closure;
+use Mistralys\MarkdownRenderer\Processors\BaseCommandBasedProcessor;
 use Mistralys\MarkdownRenderer\Processors\BaseProcessor;
+use Mistralys\MarkdownRenderer\Processors\Commands\AttributeList;
+use Mistralys\MarkdownRenderer\Processors\Commands\Command;
+use Mistralys\MarkdownRenderer\Processors\Commands\ValueAttribute;
 
 /**
  * Converts video shortcode to embedded video players.
@@ -20,7 +26,7 @@ use Mistralys\MarkdownRenderer\Processors\BaseProcessor;
  * ### Video stored locally
  *
  * ```
- * {video:file=video.mp4&type=video/mp4}
+ * {video: "video.mp4"}
  * ```
  *
  * > NOTE: Use {@see self::setVideoFolderURL()} to set the
@@ -29,15 +35,34 @@ use Mistralys\MarkdownRenderer\Processors\BaseProcessor;
  * ### Video from URL
  *
  * ```
- * {video:file=https://www.example.com/video.mp4&type=video/mp4}
+ * {video: "https://www.example.com/video.mp4&type=video/mp4"}
+ * ```
+ *
+ * ### Sound
+ *
+ * By default, videos start muted. To unmute them, add the `unmuted` attribute:
+ *
+ * ```
+ * {video: "video.mp4" unmuted}
+ * ```
+ *
+ * ## File type
+ *
+ * The file mime type is detected automatically. Should this not work,
+ * you can specify the type manually:
+ *
+ * ```
+ * {video: "video.mp4" type="video/mp4"}
  * ```
  *
  * @package MarkdownRenderer
  * @subpackage Processors
  */
-class VideosProcessor extends BaseProcessor
+class VideosProcessor extends BaseCommandBasedProcessor
 {
     const OPTION_VIDEO_FOLDER_URL = 'videoFolderURL';
+    const OPTION_MISSING_FILE_MESSAGE = 'missingFileMessage';
+    const DEFAULT_MISSING_FILE_MESSAGE = 'Video file not specified.';
 
     public function setVideoFolderURL(string $url) : self
     {
@@ -57,69 +82,64 @@ class VideosProcessor extends BaseProcessor
     public function getDefaultOptions(): array
     {
         return array(
+            self::OPTION_MISSING_FILE_MESSAGE => self::DEFAULT_MISSING_FILE_MESSAGE,
             self::OPTION_VIDEO_FOLDER_URL => '/'
         );
     }
 
-    /**
-     * @var array<int,AttributeCollection>
-     */
-    private array $videos = array();
-
-    public function preProcess(string $content) : string
+    protected function registerCommands(): void
     {
-        preg_match_all('/{video:([^}]+)}/', $content, $result, PREG_PATTERN_ORDER);
-
-        $replaces = array();
-
-        foreach($result[0] as $idx => $matchedText)
-        {
-            parse_str($result[1][$idx], $result);
-
-            $placeholder = $this->renderer->getNextPlaceholder();
-
-            $this->videos[$placeholder] = AttributeCollection::create($result);
-
-            $replaces[$matchedText] = $placeholder;
-        }
-
-        return str_replace(array_keys($replaces), array_values($replaces), $content);
+        $this->registerCommand('video', $this->renderVideo(...));
     }
 
-    public function postProcess(string $content) : string
+    private function renderVideo(Command $command) : string
     {
-        foreach($this->videos as $placeholder => $attributes)
-        {
-            $content = str_replace((string)$placeholder, $this->renderVideo($attributes), $content);
-        }
+        $attributes = $command->getAttributes();
 
-        return $content;
-    }
-
-    private function renderVideo(AttributeCollection $attributes) : string
-    {
-        if(!$attributes->hasAttribute('file')) {
+        $file = $attributes->getFirstValue();
+        if($file === null) {
             return '';
         }
 
-        $file = $attributes->getAttribute('file');
+        $video = HTMLTag::create('video')
+            ->prop('controls');
 
-        // Is this an absolute URL?
-        if(str_starts_with($file, 'http')) {
-            $src = $file;
-        } else {
-            $src = rtrim($this->getVideoFolderURL(), '/') . '/' . $file;
+        if(!$attributes->hasProperty('unmuted')) {
+            $video->prop('muted');
         }
 
-        return (string)HTMLTag::create('video')
-            ->prop('controls')
-            ->prop('muted')
+        $video
             ->attr('style', 'max-width: 100%')
             ->setContent(
                 HTMLTag::create('source')
-                    ->attr('src', $src)
-                    ->attr('type', $attributes->getAttribute('type', 'video/mp4')).
+                    ->attr('src', $this->resolveSourceURL($file))
+                    ->attr('type', $this->resolveMimeType($file, $attributes))
+                .
                 'Your browser does not support the video tag.'
             );
+
+        return (string)$video;
+    }
+
+    private function resolveSourceURL(ValueAttribute $file) : string
+    {
+        $src = $file->getValue();
+
+        // Is this an absolute URL?
+        if(!str_starts_with(strtolower($src), 'http')) {
+            return rtrim($this->getVideoFolderURL(), '/') . '/' . $src;
+        }
+
+        return $src;
+    }
+
+    private function resolveMimeType(ValueAttribute $file, AttributeList $attributes) : string
+    {
+        $type = $attributes->getValueByName('type');
+        if(!empty($type)) {
+            return $type;
+        }
+
+        return FileHelper::detectMimeType($file->getValue());
     }
 }

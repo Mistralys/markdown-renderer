@@ -12,7 +12,7 @@ class VideoProcessorTests extends RendererTestCase
 {
     public function test_localVideoWithoutURL() : void
     {
-        $renderer = Renderer::factory('{video:file=video.mp4&type=video/mp4}');
+        $renderer = Renderer::factory('{video: "video.mp4" type="video/mp4"}');
         $renderer->addProcessor(new VideosProcessor($renderer));
 
         $rendered = $renderer->render();
@@ -24,7 +24,7 @@ class VideoProcessorTests extends RendererTestCase
 
     public function test_localVideoWithURL() : void
     {
-        $renderer = Renderer::factory('{video:file=video.mp4&type=video/mp4}');
+        $renderer = Renderer::factory('{video: "video.mp4" type="video/mp4"}');
 
         $renderer->addProcessor((new VideosProcessor($renderer))
             ->setVideoFolderURL('"/videos/video.mp4"')
@@ -37,7 +37,7 @@ class VideoProcessorTests extends RendererTestCase
 
     public function test_externalVideoURL() : void
     {
-        $renderer = Renderer::factory('{video:file=https://external.com/video.mp4}');
+        $renderer = Renderer::factory('{video: "https://external.com/video.mp4" type="video/mp4"}');
 
         $renderer->addProcessor((new VideosProcessor($renderer))
             ->setVideoFolderURL('/videos/')
@@ -46,5 +46,25 @@ class VideoProcessorTests extends RendererTestCase
         $rendered = $renderer->render();
 
         $this->assertStringContainsString('"https://external.com/video.mp4"', $rendered);
+    }
+
+    public function test_autoMimeTypeMP4() : void
+    {
+        $renderer = Renderer::factory('{video: "video.mp4"}');
+
+        $renderer->addProcessor((new VideosProcessor($renderer)));
+        $rendered = $renderer->render();
+
+        $this->assertStringContainsString('type="video/mp4"', $rendered);
+    }
+
+    public function test_autoMimeTypeMKV() : void
+    {
+        $renderer = Renderer::factory('{video: "video.mkv"}');
+
+        $renderer->addProcessor((new VideosProcessor($renderer)));
+        $rendered = $renderer->render();
+
+        $this->assertStringContainsString('type="video/x-matroska"', $rendered);
     }
 }
