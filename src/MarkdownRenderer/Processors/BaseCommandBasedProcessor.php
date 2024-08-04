@@ -34,7 +34,7 @@ abstract class BaseCommandBasedProcessor extends BaseProcessor
     }
 
     /**
-     * Use {@self::registerCommand()} to register all command
+     * Use {@see self::registerCommand()} to register all command
      * names that should be detected in the document.
      *
      * @return void
@@ -46,8 +46,9 @@ abstract class BaseCommandBasedProcessor extends BaseProcessor
      * This will cause all commands with this name to be detected and
      * rendered using the callback.
      *
-     * @param string $name
-     * @param callable $renderCallback
+     * @param string $name The name of the command (The "name" part in `{name: "value"}`).
+     * @param callable $renderCallback This will be called to render the command.
+     *     It is given a single parameter: the {@see Command} object.
      * @return void
      */
     protected function registerCommand(string $name, callable $renderCallback) : void
