@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d9ba65ae5ce318cccf4a3f2f09ec6a0e",
+    "content-hash": "281cc94919706d2c63d7ae7beb77d11a",
     "packages": [
         {
             "name": "dflydev/dot-access-data",
@@ -434,16 +434,16 @@
         },
         {
             "name": "mistralys/application-utils-core",
-            "version": "dev-main",
+            "version": "2.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Mistralys/application-utils-core.git",
-                "reference": "6806a6060871b32534e0576567f91771a19694f0"
+                "reference": "dac17c1833f1d61f028a00d841761ee2056ee1b5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Mistralys/application-utils-core/zipball/6806a6060871b32534e0576567f91771a19694f0",
-                "reference": "6806a6060871b32534e0576567f91771a19694f0",
+                "url": "https://api.github.com/repos/Mistralys/application-utils-core/zipball/dac17c1833f1d61f028a00d841761ee2056ee1b5",
+                "reference": "dac17c1833f1d61f028a00d841761ee2056ee1b5",
                 "shasum": ""
             },
             "require": {
@@ -464,7 +464,6 @@
             "suggest": {
                 "mistralys/application-localization": "Required to translate available texts, from date related methods or file size labels for example."
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "files": [
@@ -488,9 +487,9 @@
             "description": "Drop-in utilities for PHP applications.",
             "support": {
                 "issues": "https://github.com/Mistralys/application-utils-core/issues",
-                "source": "https://github.com/Mistralys/application-utils-core/tree/2.2.3"
+                "source": "https://github.com/Mistralys/application-utils-core/tree/2.2.4"
             },
-            "time": "2024-07-25T14:02:54+00:00"
+            "time": "2024-08-04T10:09:10+00:00"
         },
         {
             "name": "mistralys/jtokenizer",

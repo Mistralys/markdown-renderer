@@ -24,7 +24,7 @@
     ]
   },
   "require": {
-    "mistralys/application-utils-core": ">=2.4.0",
+    "mistralys/application-utils-core": ">=2.2.4",
     "mistralys/application-localization": ">=1.4.1",
     "league/commonmark": ">=2.4.1"
   },
