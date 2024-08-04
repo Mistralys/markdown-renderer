@@ -93,4 +93,17 @@ class AttributeList
 
         return '';
     }
+
+    public function hasProperty(string $name) : bool
+    {
+        foreach($this->attributes as $attribute)
+        {
+            if($attribute instanceof PropertyAttribute && $attribute->getName() === $name)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
