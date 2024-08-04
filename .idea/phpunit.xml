@@ -4,6 +4,7 @@
     <option name="directories">
       <list>
         <option value="$PROJECT_DIR$/tests/MarkdownRendererTests" />
+        <option value="$PROJECT_DIR$/tests/MarkdownRenderer/Tests" />
       </list>
     </option>
   </component>
