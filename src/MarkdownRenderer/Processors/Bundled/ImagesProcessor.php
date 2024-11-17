@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package MarkdownRenderer
+ * @subpackage Processors
+ */
 
 declare(strict_types=1);
 
@@ -27,6 +31,9 @@ use Mistralys\MarkdownRenderer\Processors\Commands\Command;
  * > NOTE: Attributes are not passed through as-is.
  * > Only attributes known by the processor are used, so any
  * > additional attributes are ignored.
+ *
+ * @package MarkdownRenderer
+ * @subpackage Processors
  */
 class ImagesProcessor extends BaseCommandBasedProcessor
 {
