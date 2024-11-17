@@ -11,6 +11,7 @@ namespace Mistralys\MarkdownRenderer;
 use AppUtils\FileHelper\FileInfo;
 use AppUtils\FileHelper_Exception;
 use AppUtils\Interfaces\OptionableInterface;
+use AppUtils\OperationResult_Collection;
 use AppUtils\Traits\OptionableTrait;
 use League\CommonMark\Environment\Environment;
 use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
@@ -93,6 +94,21 @@ class Renderer implements OptionableInterface
         return array();
     }
 
+    public function isValid() : bool
+    {
+        return $this->getResults()->isValid();
+    }
+
+    public function getResults() : OperationResult_Collection
+    {
+        $results = new OperationResult_Collection($this);
+        foreach($this->processors as $processor) {
+            $results->addResult($processor->getResults());
+        }
+
+        return $results;
+    }
+
     public function render() : string
     {
         $this->preProcess();
@@ -128,7 +144,7 @@ class Renderer implements OptionableInterface
     {
         self::$placeholderCounter++;
 
-        return sprintf('9999999%03d99', self::$placeholderCounter);
+        return sprintf('P9999999%03d99P', self::$placeholderCounter);
     }
 
     /**
