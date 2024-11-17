@@ -11,7 +11,7 @@ use function AppUtils\parseURL;
 
 /**
  * Processor that makes it practical to create website-internal
- * URLs in the markdown content. Links can be added as per
+ * URLs in the Markdown content. Links can be added as per
  * usual in Markdown syntax, but instead of a URL, the
  * special notation `siteurl?` can be used:
  *
@@ -28,7 +28,7 @@ use function AppUtils\parseURL;
  * @package Markdown Renderer
  * @subpackage Processors
  */
-class SiteURLsProcessor extends BaseProcessor
+class SiteURLProcessor extends BaseProcessor
 {
     const OPTION_SITE_URL = 'siteURL';
 
