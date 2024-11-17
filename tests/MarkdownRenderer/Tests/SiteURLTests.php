@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mistralys\MarkdownRenderer\Tests;
 
 use MarkdownRenderer\TestClasses\RendererTestCase;
-use Mistralys\MarkdownRenderer\Processors\Bundled\SiteURLsProcessor;
+use Mistralys\MarkdownRenderer\Processors\Bundled\SiteURLProcessor;
 use Mistralys\MarkdownRenderer\Renderer;
 
 final class SiteURLTests extends RendererTestCase
@@ -33,7 +33,7 @@ MD;
     public function test_linkDefs() : void
     {
         $renderer = Renderer::factory(self::TEST_LINK_DEFS);
-        $renderer->addProcessor(new SiteURLsProcessor($renderer));
+        $renderer->addProcessor(new SiteURLProcessor($renderer));
 
         $html = $renderer->render();
 
@@ -46,7 +46,7 @@ MD;
     public function test_inlineLinks() : void
     {
         $renderer = Renderer::factory(self::TEST_INLINE_LINKS);
-        $renderer->addProcessor(new SiteURLsProcessor($renderer));
+        $renderer->addProcessor(new SiteURLProcessor($renderer));
 
         $html = $renderer->render();
 
@@ -59,7 +59,7 @@ MD;
     public function test_setBaseURL() : void
     {
         $renderer = Renderer::factory(self::TEST_INLINE_LINKS);
-        $renderer->addProcessor((new SiteURLsProcessor($renderer))
+        $renderer->addProcessor((new SiteURLProcessor($renderer))
             ->setSiteURL('https://127.0.0.1/webroot')
         );
 
