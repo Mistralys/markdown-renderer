@@ -76,7 +76,7 @@ class Renderer implements OptionableInterface
     }
 
     /**
-     * @param string|FileInfo $markdown Either a source file or the markdown content itself.
+     * @param string|FileInfo $markdown Either a source file or the Markdown content itself.
      * @return Renderer
      * @throws FileHelper_Exception
      */
@@ -152,6 +152,10 @@ class Renderer implements OptionableInterface
      */
     private array $processors = array();
 
+    /**
+     * @param ProcessorInterface $processor
+     * @return $this
+     */
     public function addProcessor(ProcessorInterface $processor) : self
     {
         $this->processors[] = $processor;
