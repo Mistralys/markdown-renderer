@@ -48,7 +48,56 @@ echo Renderer::factory($file)
     ->render();
 ```
 
-## Custom syntax
+## Bundled commands
+
+Several commands are bundled with the library, provided by the
+processor classes located at:
+
+[Processors/Bundled](/src/MarkdownRenderer/Processors/Bundled)
+
+### Displaying images
+
+#### Configuration
+
+```php
+use Mistralys\MarkdownRenderer\Processors\Bundled\ImagesProcessor;
+
+$processor = new ImagesProcessor($renderer);
+
+// The base URL is prepended to all image paths.
+$processor->setImageBaseURL('/img/');
+```
+
+#### Syntax
+
+It uses the following syntax for images:
+
+```
+{image: "test.jpg"
+    id="imageID"  
+    width="150px"
+    height="150px 
+    class="classA classB" 
+    alt="Alternative text"
+    title="Tooltip title"
+}
+```
+
+The image path is mandatory, all other attributes are optional.
+If no alternative text is provided, the title is used. If both1
+are empty, an empty `alt=""` attribute is used.
+
+Nested double quotes must be escaped like this:
+ 
+```
+title="Something \"here\""
+```
+
+> NOTE: Attributes are not passed through as-is.
+> Only attributes known by the processor are used, so any
+> additional attributes are ignored.
+
+## Adding custom commands
 
 The library is based on a simple syntax for defining custom commands,
 which follow the following scheme with pseudo HTML attributes:
@@ -101,7 +150,7 @@ that I decided to do it right.
 I have read quite a few discussions on what kind of information should
 be included in a Markdown file. Image widths are one thing that the 
 community is divided on. I agree that the width of an image is layout
-information, not content. The requirement is real however, and appears
+information, not content. The requirement is real, however, and appears
 often enough for me to take a pragmatic approach.
 
 My philosophy is that as long as the Markdown content stays easily 
