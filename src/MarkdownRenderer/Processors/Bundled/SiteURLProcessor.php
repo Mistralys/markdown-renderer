@@ -6,8 +6,12 @@
 
 namespace Mistralys\MarkdownRenderer\Processors\Bundled;
 
+use AppUtils\Interfaces\StringableInterface;
+use Closure;
 use Mistralys\MarkdownRenderer\Processors\BaseProcessor;
+use Mistralys\MarkdownRenderer\Processors\ProcessorException;
 use function AppUtils\parseURL;
+use function AppUtils\parseVariable;
 
 /**
  * Processor that makes it practical to create website-internal
@@ -31,6 +35,7 @@ use function AppUtils\parseURL;
 class SiteURLProcessor extends BaseProcessor
 {
     const OPTION_SITE_URL = 'siteURL';
+    private ?Closure $paramsCallback = null;
 
     public function getDefaultOptions(): array
     {
@@ -113,6 +118,33 @@ class SiteURLProcessor extends BaseProcessor
         return $this->getOption(self::OPTION_SITE_URL);
     }
 
+    /**
+     * Sets a callback that can be used to modify the parameters
+     * whenever a site URL is generated.
+     *
+     * Closure parameters:
+     *
+     * 1. Current parameters as `array(string => string)`.
+     * 2. The {@see SiteURLProcessor} instance.
+     *
+     * Expected return value:
+     *
+     * The modified parameters as `array(string => string)`.
+     *
+     * @var Closure|null $callback
+     * @return $this
+     */
+    public function setParamsCallback(?Closure $callback) : self
+    {
+        $this->paramsCallback = $callback;
+        return $this;
+    }
+
+    /**
+     * @param string $path
+     * @param array<string|int,string|int|float|StringableInterface> $params
+     * @return string
+     */
     public function buildURL(string $path, array $params=array()) : string
     {
         $url = ltrim($this->getSiteURL(), '/').'/';
@@ -122,14 +154,59 @@ class SiteURLProcessor extends BaseProcessor
             $url .= $path.'/';
         }
 
+        $params = $this->adjustParams($params);
+
         if(empty($params)) {
             return $url;
         }
+
+        ksort($params);
 
         if(!str_contains($url, '?')) {
             $url .= '?';
         }
 
         return $url.http_build_query($params);
+     }
+
+    /**
+     * @param array<string|int,string|int|float|StringableInterface> $params
+     * @return array<string|int,string>
+     */
+     private function stringifyParams(array $params) : array
+     {
+         $result = array();
+         foreach($params as $key => $value) {
+             $result[(string)$key] = (string)$value;
+         }
+
+         return $result;
+     }
+
+    /**
+     * @param array<string|int,string|int|float|StringableInterface> $params
+     * @return array<string,string>
+     */
+     private function adjustParams(array $params) : array
+     {
+         if(isset($this->paramsCallback))
+         {
+            $result = ($this->paramsCallback)($this->stringifyParams($params), $this);
+
+            if(!is_array($result)) {
+                throw new ProcessorException(
+                    'Invalid SiteURL parameter callback return value.',
+                    sprintf(
+                        'The callback must return an array, [%s] returned.',
+                        parseVariable($result)->enableType()->toString()
+                    ),
+                    ProcessorException::ERROR_INVALID_CALLBACK_RETURN_VALUE
+                );
+            }
+
+            $params = $result;
+         }
+
+         return $this->stringifyParams($params);
      }
 }
