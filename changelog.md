@@ -1,4 +1,4 @@
-## v1.0.3 - Site URL enhancements
+## v1.0.3 - Site URL and image enhancements
 - SiteURL Processor: Added `setParamsCallback()` to adjust the URL parameters on the fly.
 - SiteURL Processor: Now sorting URL parameters alphabetically for consistent URLs.
 - Image Processor: Added the `height`, `id` and `alt` attributes to the image command.
