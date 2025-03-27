@@ -11,6 +11,7 @@ namespace Mistralys\MarkdownRenderer\Processors\Bundled;
 use AppUtils\HTMLTag;
 use AppUtils\StyleCollection;
 use Mistralys\MarkdownRenderer\Processors\BaseCommandBasedProcessor;
+use Mistralys\MarkdownRenderer\Processors\Commands\AttributeList;
 use Mistralys\MarkdownRenderer\Processors\Commands\Command;
 
 /**
@@ -37,9 +38,16 @@ use Mistralys\MarkdownRenderer\Processors\Commands\Command;
  */
 class ImagesProcessor extends BaseCommandBasedProcessor
 {
-    const OPTION_MESSAGE_NO_IMAGE_SPECIFIED = 'messageNoImageSpecified';
-    const OPTION_IMAGE_BASE_URL = 'imageBaseURL';
-    const DEFAULT_MESSAGE_NO_IMAGE_FILE_SPECIFIED = 'No image file specified';
+    public const OPTION_MESSAGE_NO_IMAGE_SPECIFIED = 'messageNoImageSpecified';
+    public const OPTION_IMAGE_BASE_URL = 'imageBaseURL';
+    public const DEFAULT_MESSAGE_NO_IMAGE_FILE_SPECIFIED = 'No image file specified';
+
+    public const ATTRIBUTE_WIDTH = 'width';
+    public const ATTRIBUTE_CLASS = 'class';
+    public const ATTRIBUTE_TITLE = 'title';
+    public const ATTRIBUTE_ID = 'id';
+    public const ATTRIBUTE_ALTERNATE_TEXT = 'alt';
+    public const ATTRIBUTE_HEIGHT = 'height';
 
     public function getDefaultOptions(): array
     {
@@ -75,9 +83,14 @@ class ImagesProcessor extends BaseCommandBasedProcessor
 
         $styles = StyleCollection::create();
 
-        $width = $attributes->getByName('width');
+        $width = $attributes->getByName(self::ATTRIBUTE_WIDTH);
         if($width !== null) {
             $styles->style('width', $width->getValue());
+        }
+
+        $height = $attributes->getByName(self::ATTRIBUTE_HEIGHT);
+        if($height !== null) {
+            $styles->style('height', $height->getValue());
         }
 
         $src = $file->getValue();
@@ -88,9 +101,10 @@ class ImagesProcessor extends BaseCommandBasedProcessor
         $tag = HTMLTag::create('img')
             ->setSelfClosing()
             ->attr('src', $src)
-            ->addClass($attributes->getValueByName('class'))
-            ->attr('title', htmlentities($attributes->getValueByName('title')))
-            ->attr('alt', htmlentities($attributes->getValueByName('title')));
+            ->id($attributes->getValueByName(self::ATTRIBUTE_ID))
+            ->addClass($attributes->getValueByName(self::ATTRIBUTE_CLASS))
+            ->attr('title', $this->resolveTitle($attributes))
+            ->attr('alt', $this->resolveAlternateText($attributes), true);
 
         $styleString = $styles->render();
         if(!empty($styleString)) {
@@ -98,5 +112,26 @@ class ImagesProcessor extends BaseCommandBasedProcessor
         }
 
         return (string)$tag;
+    }
+
+    private function resolveTitle(AttributeList $attributes) : string
+    {
+        $title = $attributes->getValueByName(self::ATTRIBUTE_TITLE);
+
+        if(!empty($title)) {
+            return htmlspecialchars($title);
+        }
+
+        return '';
+    }
+
+    private function resolveAlternateText(AttributeList $attributes) : string
+    {
+        $alt = $attributes->getValueByName(self::ATTRIBUTE_ALTERNATE_TEXT);
+        if(!empty($alt)) {
+            return htmlspecialchars($alt);
+        }
+
+        return $this->resolveTitle($attributes);
     }
 }
